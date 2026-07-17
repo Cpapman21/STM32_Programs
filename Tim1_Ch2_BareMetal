@@ -1,0 +1,32 @@
+int main(void)
+{
+
+		RCC->AHB1ENR |= 1; /* enable GPIOA clock */
+		//RCC -> APB1ENR |= 0x01; /* Enable CLK source to TIM2 */
+		RCC ->APB2ENR |= 0x01;  /* Enable CLK source to TIM1 */
+		int CC2s = (0<<8 | 0<<9); /* CC1 channel is configured as output.*/
+		int OC2FE = (0<<10); /* CC1 behaves normally depending on counter and CCR1 values even when the trigger is
+			ON. The minimum delay to activate CC1 output when an edge occurs on the trigger input is
+			5 clock cycles.
+		TIM2 ->CCMR1 = 0x00000000
+		TIM2 -> CNT = 0;
+		TIM2 -> CR1 = 1; /*Enable Timer2 with an UP Counter */
+		int OC2PE = (0<<11); /*Preload register on TIMx_CCR1 disabled. TIMx_CCR1 can be written at anytime, the
+		new value is taken in account immediately.*/
+		int OC2M =  (3<<12); /* Toggle - OC1REF toggles when TIMx_CNT=TIMx_CCR1.*/
+		TIM1 -> PSC = 1600 - 1;
+		TIM1 -> ARR = 10000 - 1; /* Counts up to this Value */
+		TIM1->CNT = 0; /* clear counter */
+		TIM1->CR1 = 1; /* enable TIM2 */
+		TIM1 -> CCMR1 = CC2s | OC2FE | OC2PE | OC2M;
+		TIM1 -> CCR2 = 5000; /* set match value */
+		TIM1->CCER = (1 << 4);
+		TIM1->BDTR |= (1 << 15);
+		GPIOA->MODER |= 0x00080000; /* set pin to alternate function */
+		GPIOA->AFR[1] &= ~0xFFFFFFFF; /* clear pin AF bits */
+		GPIOA->AFR[1]= 0x00000010; /* set pin to AF1 for TIM1 CH2 */
+
+		while(1){
+
+		}
+}
